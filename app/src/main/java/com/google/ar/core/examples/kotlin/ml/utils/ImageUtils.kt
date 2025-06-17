@@ -5,10 +5,7 @@ import android.graphics.Matrix
 import java.io.ByteArrayOutputStream
 
 object ImageUtils {
-  /**
-   * Creates a new [Bitmap] by rotating the input bitmap [rotation] degrees.
-   * If [rotation] is 0, the input bitmap is returned.
-   */
+  /** Creates a new bitmap by rotating the input bitmap degrees. */
   fun rotateBitmap(bitmap: Bitmap, rotation: Int): Bitmap {
     if (rotation == 0) return bitmap
 
@@ -17,8 +14,7 @@ object ImageUtils {
     return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, false)
   }
 
-
-  /** Converts a [Bitmap] to [ByteArray] using [Bitmap.compress]. */
+  /** Converts a bitmap to ByteArray. */
   fun Bitmap.toByteArray(): ByteArray = ByteArrayOutputStream().use { stream ->
     this.compress(Bitmap.CompressFormat.JPEG, 100, stream)
     stream.toByteArray()

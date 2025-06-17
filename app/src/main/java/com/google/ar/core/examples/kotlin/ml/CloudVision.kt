@@ -17,7 +17,7 @@ import com.google.protobuf.ByteString
 import com.google.cloud.vision.v1.Image as GCVImage
 
 
-class GoogleCloudVisionDetector(val activity: HelloArActivity) : ObjectDetector(activity) {
+class CloudVision(val activity: HelloArActivity) : ObjectDetector(activity) {
   companion object {
     const val TAG = "GoogleCloudVisionDetector"
   }
@@ -41,24 +41,24 @@ class GoogleCloudVisionDetector(val activity: HelloArActivity) : ObjectDetector(
   val vision = ImageAnnotatorClient.create(settings)
 
   override suspend fun analyze(image: Image, imageRotation: Int): List<DetectedObjectResult> {
-      try {// Convert YUV image to Bitmap
-          Log.e(TAG, "Analyze start!")
+      try {
+          // Convert YUV image to Bitmap
           val convertYuv = convertYuv(image)
-          Log.e(TAG, "convertYuv done!")
+          Log.e(TAG, "Convert YUV image to Bitmap!")
 
           // Rotate image to upright position for better model accuracy
           val rotatedImage = ImageUtils.rotateBitmap(convertYuv, imageRotation)
-          Log.e(TAG, "rotateBitmap done!")
+          Log.e(TAG, "Rotate image to upright position for better model accuracy!")
 
           // Create request for Google Cloud Vision API
           val request = createAnnotateImageRequest(rotatedImage.toByteArray())
-          Log.e(TAG, "createAnnotateImageRequest done!")
+          Log.e(TAG, "Create request for Google Cloud Vision API!")
 
           val response = vision.batchAnnotateImages(listOf(request))
 
           // Extract and process detected object annotations
           val objectAnnotationsResult = response.responsesList.first().localizedObjectAnnotationsList
-          Log.e(TAG, "objectAnnotationsResult: $objectAnnotationsResult")
+          Log.e(TAG, "Annotations Result: $objectAnnotationsResult")
 
           return objectAnnotationsResult.map {
             // Compute center point of bounding box

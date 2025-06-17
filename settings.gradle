@@ -1,2 +1,2 @@
-rootProject.name = "ARCore Kotlin"
+rootProject.name = "AR Smart Vision"
 include ':app'

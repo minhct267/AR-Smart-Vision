@@ -32,8 +32,8 @@ import com.google.ar.core.examples.java.common.samplerender.VertexBuffer
 import com.google.ar.core.examples.java.common.samplerender.arcore.BackgroundRenderer
 import com.google.ar.core.examples.java.common.samplerender.arcore.PlaneRenderer
 import com.google.ar.core.examples.java.common.samplerender.arcore.SpecularCubemapFilter
+import com.google.ar.core.examples.kotlin.ml.CloudVision
 import com.google.ar.core.examples.kotlin.ml.DetectedObjectResult
-import com.google.ar.core.examples.kotlin.ml.GoogleCloudVisionDetector
 import com.google.ar.core.examples.kotlin.ml.render.LabelRender
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.NotYetAvailableException
@@ -43,7 +43,6 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.nio.ByteBuffer
-import java.util.Collections
 
 // =============================================================
 //                   Rendering ARCore features
@@ -51,9 +50,9 @@ import java.util.Collections
 class HelloArRenderer(val activity: HelloArActivity) :
   SampleRender.Renderer, DefaultLifecycleObserver, CoroutineScope by MainScope() {
 
-  // -------------------------------
-  // Constants & Companion Object
-  // -------------------------------
+  // ----------------------------------------
+  // ----- Constants & Companion Object -----
+  // ----------------------------------------
   companion object {
     const val TAG = "HelloArRenderer"
 
@@ -82,7 +81,7 @@ class HelloArRenderer(val activity: HelloArActivity) :
 
 
   // -------------------------------
-  // Rendering Resources
+  // ----- Rendering Resources -----
   // -------------------------------
   lateinit var render: SampleRender
   lateinit var planeRenderer: PlaneRenderer
@@ -109,30 +108,30 @@ class HelloArRenderer(val activity: HelloArActivity) :
   lateinit var flickerTexture: Texture
 
   // Flicker effect parameters
-  private val flickerOffsetY = 0.26f  // Translate y units regarding anchor
-  private val flickerScale = 0.07f // Radius of flicker
+  private val flickerOffsetY = 0.27f
+  private val flickerScale = 0.06f
   private val flickerFrequencies = listOf(7.0, 8.0, 9.0, 11.0, 7.5, 8.5)
   private val wrappedAnchors = mutableListOf<WrappedAnchor>()
 
-  // Restrict region for flicker highlighting (normalized screen coordinates)
+  // Restrict region for flicker highlighting
   private val restrictRegion = RectF(0.35f, 0.35f, 0.65f, 0.65f)
 
   // Label rendering for Detection
   val labelRenderer = LabelRender()
 
 
-  // -------------------------------
-  // Object Detection State
-  // -------------------------------
-  val objectDetector = GoogleCloudVisionDetector(activity)
+  // ----------------------------------
+  // ----- Object Detection State -----
+  // ----------------------------------
+  val objectDetector = CloudVision(activity)
   var scanButtonWasPressed = false
   var objectResults: List<DetectedObjectResult>? = null
-  val detectedAnchors = Collections.synchronizedList(mutableListOf<DetectedAnchor>())
+  val detectedAnchors = mutableListOf<DetectedAnchor>()
 
 
-  // -------------------------------
-  // Environmental HDR Lighting
-  // -------------------------------
+  // --------------------------------------
+  // ----- Environmental HDR Lighting -----
+  // --------------------------------------
   lateinit var dfgTexture: Texture
   lateinit var cubemapFilter: SpecularCubemapFilter
 
@@ -165,14 +164,13 @@ class HelloArRenderer(val activity: HelloArActivity) :
   private fun showSnackbar(message: String): Unit = activity.view.snackbarHelper.showError(activity, message)
 
 
-  // -------------------------------
-  // Lifecycle Methods
-  // -------------------------------
+  // -----------------------------
+  // ----- Lifecycle Methods -----
+  // -----------------------------
   override fun onResume(owner: LifecycleOwner) {
     displayRotationHelper.onResume()
     hasSetTextureNames = false
   }
-
   override fun onPause(owner: LifecycleOwner) {
     displayRotationHelper.onPause()
   }
@@ -309,7 +307,7 @@ class HelloArRenderer(val activity: HelloArActivity) :
   }
 
 
-  // Update viewport and framebuffer size when surface changes
+  /** Update viewport and framebuffer size when surface changes. */
   override fun onSurfaceChanged(render: SampleRender, width: Int, height: Int) {
     displayRotationHelper.onSurfaceChanged(width, height)
     virtualSceneFramebuffer.resize(width, height)
@@ -331,10 +329,9 @@ class HelloArRenderer(val activity: HelloArActivity) :
       hasSetTextureNames = true
     }
 
-    // -----------------------------
-    // -- Update per-frame state ---
-    // -----------------------------
-
+    // ----------------------------------
+    // ----- Update per-frame state -----
+    // ----------------------------------
     // Update ARCore session if view size changed
     displayRotationHelper.updateSessionIfNeeded(session)
 
@@ -416,10 +413,9 @@ class HelloArRenderer(val activity: HelloArActivity) :
     }
 
 
-    // -------------------------------------------------------------
-    // --- Draw non-occluded virtual objects (point cloud, etc.) ---
-    // -------------------------------------------------------------
-
+    // -----------------------------------------------------------------
+    // ----- Draw non-occluded virtual objects (point cloud, etc.) -----
+    // -----------------------------------------------------------------
     // Get projection and view matrices
     camera.getProjectionMatrix(projectionMatrix, 0, Z_NEAR, Z_FAR)
     camera.getViewMatrix(viewMatrix, 0)
@@ -435,7 +431,6 @@ class HelloArRenderer(val activity: HelloArActivity) :
       render.draw(pointCloudMesh, pointCloudShader)
     }
 
-    /** Display/Hide planes (the white mesh on the surface) as needed. */
 //    // Visualize planes
 //    planeRenderer.drawPlanes(
 //      render,
@@ -445,9 +440,9 @@ class HelloArRenderer(val activity: HelloArActivity) :
 //    )
 
 
-    // +++++++++++++++++++++++++++++++++++
-    // ++++++++ Object detection +++++++++
-    // +++++++++++++++++++++++++++++++++++
+    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // ++++++++ Object detection with Cloud Vision API +++++++++
+    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     if (scanButtonWasPressed) {
       scanButtonWasPressed = false
       val cameraImage = frame.tryAcquireCameraImage()
@@ -489,13 +484,10 @@ class HelloArRenderer(val activity: HelloArActivity) :
         Log.e("Mimi", "Trying to create anchor at ($atX, $atY)")
 
         val anchor = createAnchor(atX.toFloat(), atY.toFloat(), frame) ?: return@mapNotNull null
-        Log.i("Mimi", "Created anchor ${anchor.pose} from hit test!")
-
-        DetectedAnchor(anchor, obj.label)
+        DetectedAnchor(anchor, obj.label, System.nanoTime())
       }
 
       detectedAnchors.addAll(anchors)
-
       view.post {
         try {
             view.resetButton.isEnabled = detectedAnchors.isNotEmpty()
@@ -513,7 +505,7 @@ class HelloArRenderer(val activity: HelloArActivity) :
     }
 
     // Render labels for detected objects
-    for (detectedAnchor in detectedAnchors) {
+    for ((i, detectedAnchor) in detectedAnchors.withIndex()) {
       val anchor = detectedAnchor.anchor
       if (anchor.trackingState != TrackingState.TRACKING) continue
       labelRenderer.draw(
@@ -525,10 +517,25 @@ class HelloArRenderer(val activity: HelloArActivity) :
       )
     }
 
+    // Add virtual objects (pawn) at each detected label (Pawn on Label)
+    for (detectedAnchor in detectedAnchors) {
+      val anchor = detectedAnchor.anchor
+      if (anchor.trackingState != TrackingState.TRACKING) continue
 
-    // -----------------------------------------------------------------
-    // --- Draw occluded virtual objects (anchors, flickers, labels) ---
-    // -----------------------------------------------------------------
+      anchor.pose.toMatrix(modelMatrix, 0)
+      Matrix.multiplyMM(modelViewMatrix, 0, viewMatrix, 0, modelMatrix, 0)
+      Matrix.multiplyMM(modelViewProjectionMatrix, 0, projectionMatrix, 0, modelViewMatrix, 0)
+
+      // Update shader properties and draw
+      virtualObjectShader.setMat4("u_ModelView", modelViewMatrix)
+      virtualObjectShader.setMat4("u_ModelViewProjection", modelViewProjectionMatrix)
+      virtualObjectShader.setTexture("u_AlbedoTexture", virtualObjectAlbedoTexture)
+      render.draw(virtualObjectMesh, virtualObjectShader, virtualSceneFramebuffer)
+    }
+
+    // ---------------------------------------------------------------------
+    // ----- Draw occluded virtual objects (anchors, flickers, labels) -----
+    // ---------------------------------------------------------------------
 
     // Update lighting parameters for shaders
     updateLightEstimation(frame.lightEstimate, viewMatrix)
@@ -556,26 +563,9 @@ class HelloArRenderer(val activity: HelloArActivity) :
     }
 
 
-    // +++++ Add virtual objects (pawn) at each detected label (Pawn on Label) +++++
-    for (detectedAnchor in detectedAnchors) {
-      val anchor = detectedAnchor.anchor
-      if (anchor.trackingState != TrackingState.TRACKING) continue
-
-      anchor.pose.toMatrix(modelMatrix, 0)
-      Matrix.multiplyMM(modelViewMatrix, 0, viewMatrix, 0, modelMatrix, 0)
-      Matrix.multiplyMM(modelViewProjectionMatrix, 0, projectionMatrix, 0, modelViewMatrix, 0)
-
-      // Update shader properties and draw
-      virtualObjectShader.setMat4("u_ModelView", modelViewMatrix)
-      virtualObjectShader.setMat4("u_ModelViewProjection", modelViewProjectionMatrix)
-      virtualObjectShader.setTexture("u_AlbedoTexture", virtualObjectAlbedoTexture)
-      render.draw(virtualObjectMesh, virtualObjectShader, virtualSceneFramebuffer)
-    }
-
-
-    // ----------------------------
-    // --- Flicker effect logic ---
-    // ----------------------------
+    // ------------------------------------------
+    // ---------- Flicker effect logic ----------
+    // ------------------------------------------
     data class FlickerInfo(
       val index: Int,
       val wrappedAnchor: WrappedAnchor,
@@ -584,7 +574,6 @@ class HelloArRenderer(val activity: HelloArActivity) :
       val isInRestrictRegion: Boolean,
       val flickerOn: Boolean
     )
-
     val flickerInfos = mutableListOf<FlickerInfo>()
 
     for ((i, wrappedAnchor) in wrappedAnchors.withIndex()) {
@@ -640,9 +629,9 @@ class HelloArRenderer(val activity: HelloArActivity) :
       .minByOrNull { it.distanceToCamera }
 
 
-    // ---------------------------------
-    // ------- Render flickers ---------
-    // ---------------------------------
+    // ---------------------------------------
+    // ---------- Render flickers ------------
+    // ---------------------------------------
     for (info in flickerInfos) {
       if (!info.flickerOn) continue
       val wrappedAnchor = info.wrappedAnchor
@@ -734,9 +723,9 @@ class HelloArRenderer(val activity: HelloArActivity) :
     )
   }
 
-  // ------------------------------------------------------------------
-  // --- User interaction: handle tap to place anchors in the scene ---
-  // ------------------------------------------------------------------
+  // ----------------------------------------------------
+  // ----- Handle tap to place anchors in the scene -----
+  // ----------------------------------------------------
   private fun handleTap(frame: Frame, camera: Camera) {
     if (camera.trackingState != TrackingState.TRACKING) return
     val tap = activity.view.tapHelper.poll() ?: return
@@ -790,9 +779,9 @@ class HelloArRenderer(val activity: HelloArActivity) :
   }
 
 
-  // ---------------------------------------------------------------------
-  // --- Utility: project 3D world position to normalized screen space ---
-  // ---------------------------------------------------------------------
+  // ----------------------------------------------------------------
+  // ----- Project 3D world position to normalized screen space -----
+  // ----------------------------------------------------------------
   private fun worldToScreen(
     worldPosition: FloatArray, // [x, y, z, 1]
     viewMatrix: FloatArray,
@@ -821,9 +810,9 @@ class HelloArRenderer(val activity: HelloArActivity) :
   }
 
 
-  // --------------------------------------------------------------------
-  // --- Object Detection Pipeline: handle detection and anchor logic ---
-  // --------------------------------------------------------------------
+  // ------------------------------------------------------------------------
+  // ----- Object Detection Pipeline: handle detection and anchor logic -----
+  // ------------------------------------------------------------------------
 
   // Call this to trigger object detection in the next frame
   fun bindView(view: HelloArView) {
@@ -838,6 +827,7 @@ class HelloArRenderer(val activity: HelloArActivity) :
 
     view.resetButton.setOnClickListener {
       detectedAnchors.clear()
+      wrappedAnchors.clear()
       view.resetButton.isEnabled = false
       hideSnackbar()
     }
@@ -883,12 +873,13 @@ class HelloArRenderer(val activity: HelloArActivity) :
 private data class WrappedAnchor(
   val anchor: Anchor,
   val trackable: Trackable,
-  val createdTimestamp: Long = System.nanoTime(),
+  val createdTimestamp: Long,
   val flickerFrequencyHz: Double
 )
 
 /** Stores an anchor and its associated label (for object detection). */
 data class DetectedAnchor(
   val anchor: Anchor,
-  val label: String
+  val label: String,
+  val createdTimestamp: Long
 )
