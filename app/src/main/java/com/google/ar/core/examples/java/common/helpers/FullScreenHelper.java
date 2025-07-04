@@ -3,9 +3,7 @@ package com.google.ar.core.examples.java.common.helpers;
 import android.app.Activity;
 import android.view.View;
 
-/** Helper to set up the Android full screen mode. */
 public final class FullScreenHelper {
-  // Sets the Android fullscreen flags.
   public static void setFullScreenOnWindowFocusChanged(Activity activity, boolean hasFocus) {
     if (hasFocus) {
       activity

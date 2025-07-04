@@ -18,7 +18,6 @@ public final class SnackbarHelper {
     return messageSnackbar != null;
   }
 
-  /** Shows a snackbar with a given message. */
   public void showMessage(Activity activity, String message) {
     if (!message.isEmpty() && (!isShowing() || !lastMessage.equals(message))) {
       lastMessage = message;
@@ -26,7 +25,6 @@ public final class SnackbarHelper {
     }
   }
 
-  /** Shows a snackbar with a given message, and a dismiss button. */
   public void showMessageWithDismiss(Activity activity, String message) {
     show(activity, message, DismissBehavior.SHOW);
   }
@@ -39,12 +37,10 @@ public final class SnackbarHelper {
     show(activity, message, DismissBehavior.SHOW, Snackbar.LENGTH_LONG);
   }
 
-  /** Shows a snackbar with a given error message. */
   public void showError(Activity activity, String errorMessage) {
     show(activity, errorMessage, DismissBehavior.FINISH);
   }
 
-  /** Hides the currently showing snackbar, if there is one. */
   public void hide(Activity activity) {
     if (!isShowing()) {
       return;
@@ -65,12 +61,10 @@ public final class SnackbarHelper {
     maxLines = lines;
   }
 
-  /** Returns whether the snackbar is currently being shown with an indefinite duration. */
   public boolean isDurationIndefinite() {
     return isShowing() && messageSnackbar.getDuration() == Snackbar.LENGTH_INDEFINITE;
   }
 
-  /** Sets the view that will be used to find a suitable parent view to hold the snackbar view. */
   public void setParentView(View snackbarView) {
     this.snackbarView = snackbarView;
   }

@@ -13,12 +13,10 @@ import com.google.ar.core.Config
 import com.google.ar.core.examples.java.common.helpers.SnackbarHelper
 import com.google.ar.core.examples.java.common.helpers.TapHelper
 
-// =============================================================
-//                        HelloArView
-// =============================================================
+
 class HelloArView(val activity: HelloArActivity) : DefaultLifecycleObserver {
 
-  // Root layout + key widgets
+  // Root layout and key widgets
   val root = View.inflate(activity, R.layout.activity_main, null)
   val surfaceView = root.findViewById<GLSurfaceView>(R.id.surfaceview)
   val scanButton = root.findViewById<AppCompatButton>(R.id.scanButton)
@@ -50,7 +48,7 @@ class HelloArView(val activity: HelloArActivity) : DefaultLifecycleObserver {
       }
     }
 
-  /** Enable / disable the Scan button based on capture state. */
+  /** Enable or disable the Scan button based on capture state. */
   fun setScanningActive(active: Boolean) = when(active) {
     true -> {
       scanButton.isEnabled = false

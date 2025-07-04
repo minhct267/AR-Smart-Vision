@@ -67,6 +67,7 @@ public class BackgroundRenderer {
             Texture.Target.TEXTURE_EXTERNAL_OES,
             Texture.WrapMode.CLAMP_TO_EDGE,
             /*useMipmaps=*/ false);
+
     cameraDepthTexture =
         new Texture(
             render,

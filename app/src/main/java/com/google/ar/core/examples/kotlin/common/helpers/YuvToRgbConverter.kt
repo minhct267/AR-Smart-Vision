@@ -28,9 +28,7 @@ class YuvToRgbConverter(context: Context) {
   private lateinit var inputAllocation: Allocation
   private lateinit var outputAllocation: Allocation
 
-  // ---------------------------------------------------
-  // Convert YUV Image to RGB Bitmap
-  // ---------------------------------------------------
+  /* Convert YUV Image to RGB Bitmap. */
   @Synchronized
   fun yuvToRgb(image: Image, output: Bitmap) {
 
@@ -46,14 +44,12 @@ class YuvToRgbConverter(context: Context) {
     // Extract YUV data from Image into the byte array (NV21 format)
     imageToByteArray(image, yuvBuffer)
 
-    // Allocate RenderScript input and output only once
     if (!::inputAllocation.isInitialized) {
-      // Create a YUV-type element with NV21 format
       val elemType = Type.Builder(rs, Element.YUV(rs)).setYuvFormat(ImageFormat.NV21).create()
       inputAllocation = Allocation.createSized(rs, elemType.element, yuvBuffer.size)
     }
+
     if (!::outputAllocation.isInitialized) {
-      // Create an allocation backed by the target Bitmap
       outputAllocation = Allocation.createFromBitmap(rs, output)
     }
 
@@ -64,10 +60,9 @@ class YuvToRgbConverter(context: Context) {
     outputAllocation.copyTo(output)
   }
 
-  // ---------------------------------------------------
-  // Extract YUV Planes into Byte Array
-  // ---------------------------------------------------
+  /* Extract YUV Planes into Byte Array. */
   private fun imageToByteArray(image: Image, outputBuffer: ByteArray) {
+
     // Ensure only YUV_420_888 images are handled
     assert(image.format == ImageFormat.YUV_420_888)
 
@@ -85,16 +80,13 @@ class YuvToRgbConverter(context: Context) {
         }
         1 -> {
           outputStride = 2
-          // For NV21 format, U is in odd-numbered indices
           outputOffset = pixelCount + 1
         }
         2 -> {
           outputStride = 2
-          // For NV21 format, V is in even-numbered indices
           outputOffset = pixelCount
         }
         else -> {
-          // Image contains more than 3 planes, something strange is going on
           return@forEachIndexed
         }
       }
@@ -129,7 +121,7 @@ class YuvToRgbConverter(context: Context) {
       }
 
       for (row in 0 until planeHeight) {
-        // Move buffer position to the beginning of this row
+
         planeBuffer.position(
           (row + planeCrop.top) * rowStride + planeCrop.left * pixelStride
         )

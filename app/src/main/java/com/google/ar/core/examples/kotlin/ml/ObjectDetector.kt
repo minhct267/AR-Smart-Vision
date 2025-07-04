@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.media.Image
 import com.google.ar.core.examples.kotlin.common.helpers.YuvToRgbConverter
 
-
 abstract class ObjectDetector(val context: Context) {
   val yuvConverter = YuvToRgbConverter(context)
 

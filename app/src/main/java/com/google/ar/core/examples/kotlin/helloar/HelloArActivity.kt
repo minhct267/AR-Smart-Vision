@@ -19,9 +19,6 @@ import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException
 
-// =============================================================
-//                      HelloArActivity
-// =============================================================
 class HelloArActivity : AppCompatActivity() {
   companion object { private const val TAG = "HelloArActivity" }
 
@@ -60,17 +57,17 @@ class HelloArActivity : AppCompatActivity() {
     arCoreSessionHelper.beforeSessionResume = ::configureSession
     lifecycle.addObserver(arCoreSessionHelper)
 
-    // Set up the Hello AR renderer
+    // Set up renderer
     renderer = HelloArRenderer(this)
     lifecycle.addObserver(renderer)
 
-    // Set up Hello AR UI
+    // Set up UI
     view = HelloArView(this)
     renderer.bindView(view)
     lifecycle.addObserver(view)
     setContentView(view.root)
 
-    // Kick off the render loop (HelloArRenderer)
+    // Kick off the render loop
     SampleRender(view.surfaceView, renderer, assets)
 
     // Hook up on-screen toggles (Depth / Instant Placement)
@@ -111,13 +108,13 @@ class HelloArActivity : AppCompatActivity() {
   ) {
     super.onRequestPermissionsResult(requestCode, permissions, results)
     if (!CameraPermissionHelper.hasCameraPermission(this)) {
-      // Use toast instead of snackbar here since the activity will exit.
       Toast.makeText(this, "Camera permission is needed to run this application", Toast.LENGTH_LONG)
         .show()
+
       if (!CameraPermissionHelper.shouldShowRequestPermissionRationale(this)) {
-        // Permission denied with checking "Do not ask again".
         CameraPermissionHelper.launchPermissionSettings(this)
       }
+
       finish()
     }
   }

@@ -44,9 +44,6 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import java.nio.ByteBuffer
 
-// =============================================================
-//                   Rendering ARCore features
-// =============================================================
 class HelloArRenderer(val activity: HelloArActivity) :
   SampleRender.Renderer, DefaultLifecycleObserver, CoroutineScope by MainScope() {
 
@@ -136,9 +133,9 @@ class HelloArRenderer(val activity: HelloArActivity) :
   lateinit var cubemapFilter: SpecularCubemapFilter
 
 
-  // ---------------------------------
-  // Matrix Buffers (reused per frame)
-  // ---------------------------------
+  // ------------------------------------
+  // ----- Matrix Buffers & Shaders -----
+  // ------------------------------------
   val modelMatrix = FloatArray(16)
   val viewMatrix = FloatArray(16)
   val projectionMatrix = FloatArray(16)
@@ -164,13 +161,14 @@ class HelloArRenderer(val activity: HelloArActivity) :
   private fun showSnackbar(message: String): Unit = activity.view.snackbarHelper.showError(activity, message)
 
 
-  // -----------------------------
-  // ----- Lifecycle Methods -----
-  // -----------------------------
+  // -----------------------------------
+  // -------- Lifecycle Methods --------
+  // -----------------------------------
   override fun onResume(owner: LifecycleOwner) {
     displayRotationHelper.onResume()
     hasSetTextureNames = false
   }
+
   override fun onPause(owner: LifecycleOwner) {
     displayRotationHelper.onPause()
   }
@@ -431,14 +429,13 @@ class HelloArRenderer(val activity: HelloArActivity) :
       render.draw(pointCloudMesh, pointCloudShader)
     }
 
-//    // Visualize planes
-//    planeRenderer.drawPlanes(
-//      render,
-//      session.getAllTrackables<Plane>(Plane::class.java),
-//      camera.displayOrientedPose,
-//      projectionMatrix
-//    )
-
+    // Visualize planes
+    planeRenderer.drawPlanes(
+      render,
+      session.getAllTrackables<Plane>(Plane::class.java),
+      camera.displayOrientedPose,
+      projectionMatrix
+    )
 
     // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // ++++++++ Object detection with Cloud Vision API +++++++++

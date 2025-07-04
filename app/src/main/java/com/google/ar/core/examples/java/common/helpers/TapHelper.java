@@ -12,7 +12,6 @@ public final class TapHelper implements OnTouchListener {
   private final GestureDetector gestureDetector;
   private final BlockingQueue<MotionEvent> queuedSingleTaps = new ArrayBlockingQueue<>(16);
 
-  /** Creates the tap helper. */
   public TapHelper(Context context) {
     gestureDetector =
         new GestureDetector(
@@ -31,7 +30,6 @@ public final class TapHelper implements OnTouchListener {
             });
   }
 
-  /** Polls for a tap. */
   public MotionEvent poll() {
     return queuedSingleTaps.poll();
   }
