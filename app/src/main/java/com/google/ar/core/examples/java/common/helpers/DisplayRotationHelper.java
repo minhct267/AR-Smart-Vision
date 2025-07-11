@@ -51,6 +51,7 @@ public final class DisplayRotationHelper implements DisplayListener {
   public float getCameraSensorRelativeViewportAspectRatio(String cameraId) {
     float aspectRatio;
     int cameraSensorToDisplayRotation = getCameraSensorToDisplayRotation(cameraId);
+
     switch (cameraSensorToDisplayRotation) {
       case 90:
       case 270:
@@ -63,16 +64,19 @@ public final class DisplayRotationHelper implements DisplayListener {
       default:
         throw new RuntimeException("Unhandled rotation: " + cameraSensorToDisplayRotation);
     }
+
     return aspectRatio;
   }
 
   public int getCameraSensorToDisplayRotation(String cameraId) {
     CameraCharacteristics characteristics;
+
     try {
       characteristics = cameraManager.getCameraCharacteristics(cameraId);
     } catch (CameraAccessException e) {
       throw new RuntimeException("Unable to determine display orientation", e);
     }
+
     int sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
     int displayOrientation = toDegrees(display.getRotation());
     return (sensorOrientation - displayOrientation + 360) % 360;

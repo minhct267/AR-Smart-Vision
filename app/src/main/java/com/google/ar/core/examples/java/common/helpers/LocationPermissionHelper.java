@@ -14,13 +14,11 @@ public final class LocationPermissionHelper {
   private static final String LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION;
 
   public static boolean hasFineLocationPermission(Activity activity) {
-    return ContextCompat.checkSelfPermission(activity, LOCATION_PERMISSION)
-        == PackageManager.PERMISSION_GRANTED;
+    return ContextCompat.checkSelfPermission(activity, LOCATION_PERMISSION) == PackageManager.PERMISSION_GRANTED;
   }
 
   public static void requestFineLocationPermission(Activity activity) {
-    ActivityCompat.requestPermissions(
-        activity, new String[] {LOCATION_PERMISSION}, LOCATION_PERMISSION_CODE);
+    ActivityCompat.requestPermissions(activity, new String[] {LOCATION_PERMISSION}, LOCATION_PERMISSION_CODE);
   }
 
   public static boolean hasFineLocationPermissionsResponseInResult(String[] permissions) {

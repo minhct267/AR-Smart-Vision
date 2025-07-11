@@ -73,11 +73,7 @@ public final class SnackbarHelper {
     show(activity, message, dismissBehavior, Snackbar.LENGTH_INDEFINITE);
   }
 
-  private void show(
-      final Activity activity,
-      final String message,
-      final DismissBehavior dismissBehavior,
-      int duration) {
+  private void show(final Activity activity, final String message, final DismissBehavior dismissBehavior, int duration) {
     activity.runOnUiThread(
         new Runnable() {
           @Override
@@ -90,6 +86,7 @@ public final class SnackbarHelper {
                     message,
                     duration);
             messageSnackbar.getView().setBackgroundColor(BACKGROUND_COLOR);
+
             if (dismissBehavior != DismissBehavior.HIDE && duration == Snackbar.LENGTH_INDEFINITE) {
               messageSnackbar.setAction(
                   "Dismiss",
@@ -110,6 +107,7 @@ public final class SnackbarHelper {
                     });
               }
             }
+
             ((TextView)
                     messageSnackbar
                         .getView()

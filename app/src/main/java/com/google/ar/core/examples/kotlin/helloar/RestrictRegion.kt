@@ -8,11 +8,8 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 
-class RestrictRegion @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
-) : View(context, attrs) {
+class RestrictRegion @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
 
-    // No fill, white border
     private val borderPaint = Paint().apply {
         color = Color.WHITE
         style = Paint.Style.STROKE
@@ -20,7 +17,6 @@ class RestrictRegion @JvmOverloads constructor(
         isAntiAlias = true
     }
 
-    // Normalized region
     var restrictRegion: RectF = RectF(0.35f, 0.35f, 0.65f, 0.65f)
         set(value) {
             field = value

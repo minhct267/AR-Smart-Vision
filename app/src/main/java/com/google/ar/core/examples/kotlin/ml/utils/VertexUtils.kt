@@ -3,20 +3,11 @@ package com.google.ar.core.examples.kotlin.ml.utils
 import com.google.cloud.vision.v1.NormalizedVertex
 
 object VertexUtils {
-  /** Convert a [NormalizedVertex] to an absolute coordinate pair. */
-  fun NormalizedVertex.toAbsoluteCoordinates(
-    imageWidth: Int,
-    imageHeight: Int,
-  ): Pair<Int, Int> {
+  fun NormalizedVertex.toAbsoluteCoordinates(imageWidth: Int, imageHeight: Int, ): Pair<Int, Int> {
     return (x * imageWidth).toInt() to (y * imageHeight).toInt()
   }
 
-  /** Rotates a coordinate pair according to [imageRotation]. */
-  fun Pair<Int, Int>.rotateCoordinates(
-    imageWidth: Int,
-    imageHeight: Int,
-    imageRotation: Int,
-  ): Pair<Int, Int> {
+  fun Pair<Int, Int>.rotateCoordinates(imageWidth: Int, imageHeight: Int, imageRotation: Int, ): Pair<Int, Int> {
     val (x, y) = this
     return when (imageRotation) {
       0 -> x to y
@@ -27,7 +18,6 @@ object VertexUtils {
     }
   }
 
-  /** Calculate a point using the average of points in the bounding polygon. */
   fun List<NormalizedVertex>.calculateAverage(): NormalizedVertex {
     var averageX = 0f
     var averageY = 0f

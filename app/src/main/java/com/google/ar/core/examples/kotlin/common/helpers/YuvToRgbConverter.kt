@@ -11,37 +11,23 @@ import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicYuvToRGB
 import android.renderscript.Type
 
-/** Utility class to convert an Android media.Image in YUV_420_888 format to an RGB Bitmap. */
 class YuvToRgbConverter(context: Context) {
-
-  // RenderScript & ScriptIntrinsic Initialization
   private val rs = RenderScript.create(context)
   private val scriptYuvToRgb = ScriptIntrinsicYuvToRGB.create(rs, Element.U8_4(rs))
-
-  // Buffer and allocation fields
   private var pixelCount: Int = -1
-
-  // Byte array that holds raw YUV data in NV21 format
   private lateinit var yuvBuffer: ByteArray
-
-  // RenderScript allocations for input (YUV) and output (RGB)
   private lateinit var inputAllocation: Allocation
   private lateinit var outputAllocation: Allocation
 
-  /* Convert YUV Image to RGB Bitmap. */
   @Synchronized
   fun yuvToRgb(image: Image, output: Bitmap) {
 
-    // Allocate or reuse the YUV byte buffer
     if (!::yuvBuffer.isInitialized) {
       pixelCount = image.width * image.height
-
-      // Calculate total buffer size based on bits per pixel for YUV_420_888
       val pixelSizeBits = ImageFormat.getBitsPerPixel(ImageFormat.YUV_420_888)
       yuvBuffer = ByteArray(pixelCount * pixelSizeBits / 8)
     }
 
-    // Extract YUV data from Image into the byte array (NV21 format)
     imageToByteArray(image, yuvBuffer)
 
     if (!::inputAllocation.isInitialized) {
@@ -53,17 +39,13 @@ class YuvToRgbConverter(context: Context) {
       outputAllocation = Allocation.createFromBitmap(rs, output)
     }
 
-    // Convert NV21 format YUV -> RGB
     inputAllocation.copyFrom(yuvBuffer)
     scriptYuvToRgb.setInput(inputAllocation)
     scriptYuvToRgb.forEach(outputAllocation)
     outputAllocation.copyTo(output)
   }
 
-  /* Extract YUV Planes into Byte Array. */
   private fun imageToByteArray(image: Image, outputBuffer: ByteArray) {
-
-    // Ensure only YUV_420_888 images are handled
     assert(image.format == ImageFormat.YUV_420_888)
 
     val imageCrop = Rect(0, 0, image.width, image.height)
@@ -95,7 +77,6 @@ class YuvToRgbConverter(context: Context) {
       val rowStride = plane.rowStride
       val pixelStride = plane.pixelStride
 
-      // Divide the width and height by two if it's not the Y plane
       val planeCrop = if (planeIndex == 0) {
         imageCrop
       } else {
@@ -109,11 +90,8 @@ class YuvToRgbConverter(context: Context) {
 
       val planeWidth = planeCrop.width()
       val planeHeight = planeCrop.height()
-
-      // Intermediate buffer used to store the bytes of each row
       val rowBuffer = ByteArray(plane.rowStride)
 
-      // Size of each row in bytes
       val rowLength = if (pixelStride == 1 && outputStride == 1) {
         planeWidth
       } else {

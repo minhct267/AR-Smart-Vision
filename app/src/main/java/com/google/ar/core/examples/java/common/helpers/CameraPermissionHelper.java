@@ -14,13 +14,11 @@ public final class CameraPermissionHelper {
   private static final String CAMERA_PERMISSION = Manifest.permission.CAMERA;
 
   public static boolean hasCameraPermission(Activity activity) {
-    return ContextCompat.checkSelfPermission(activity, CAMERA_PERMISSION)
-        == PackageManager.PERMISSION_GRANTED;
+    return ContextCompat.checkSelfPermission(activity, CAMERA_PERMISSION) == PackageManager.PERMISSION_GRANTED;
   }
 
   public static void requestCameraPermission(Activity activity) {
-    ActivityCompat.requestPermissions(
-        activity, new String[] {CAMERA_PERMISSION}, CAMERA_PERMISSION_CODE);
+    ActivityCompat.requestPermissions(activity, new String[] {CAMERA_PERMISSION}, CAMERA_PERMISSION_CODE);
   }
 
   public static boolean shouldShowRequestPermissionRationale(Activity activity) {

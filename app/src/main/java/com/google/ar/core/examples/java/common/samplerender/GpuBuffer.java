@@ -4,14 +4,10 @@ import android.opengl.GLES30;
 import android.util.Log;
 import java.nio.Buffer;
 
-/* package-private */
 class GpuBuffer {
   private static final String TAG = GpuBuffer.class.getSimpleName();
-
-  // These values refer to the byte count of the corresponding Java datatypes.
   public static final int INT_SIZE = 4;
   public static final int FLOAT_SIZE = 4;
-
   private final int target;
   private final int numberOfBytesPerEntry;
   private final int[] bufferId = {0};
@@ -23,8 +19,6 @@ class GpuBuffer {
       if (!entries.isDirect()) {
         throw new IllegalArgumentException("If non-null, entries buffer must be a direct buffer");
       }
-      // Some GPU drivers will fail with out of memory errors if glBufferData or glBufferSubData is
-      // called with a size of 0, so avoid this case.
       if (entries.limit() == 0) {
         entries = null;
       }
@@ -32,6 +26,7 @@ class GpuBuffer {
 
     this.target = target;
     this.numberOfBytesPerEntry = numberOfBytesPerEntry;
+
     if (entries == null) {
       this.size = 0;
       this.capacity = 0;
@@ -41,7 +36,6 @@ class GpuBuffer {
     }
 
     try {
-      // Clear VAO to prevent unintended state change.
       GLES30.glBindVertexArray(0);
       GLError.maybeThrowGLException("Failed to unbind vertex array", "glBindVertexArray");
 
@@ -56,7 +50,9 @@ class GpuBuffer {
         GLES30.glBufferData(
             target, entries.limit() * numberOfBytesPerEntry, entries, GLES30.GL_DYNAMIC_DRAW);
       }
+
       GLError.maybeThrowGLException("Failed to populate buffer object", "glBufferData");
+
     } catch (Throwable t) {
       free();
       throw t;
@@ -64,15 +60,15 @@ class GpuBuffer {
   }
 
   public void set(Buffer entries) {
-    // Some GPU drivers will fail with out of memory errors if glBufferData or glBufferSubData is
-    // called with a size of 0, so avoid this case.
     if (entries == null || entries.limit() == 0) {
       size = 0;
       return;
     }
+
     if (!entries.isDirect()) {
       throw new IllegalArgumentException("If non-null, entries buffer must be a direct buffer");
     }
+
     GLES30.glBindBuffer(target, bufferId[0]);
     GLError.maybeThrowGLException("Failed to bind vertex buffer object", "glBindBuffer");
 
@@ -82,9 +78,9 @@ class GpuBuffer {
       GLES30.glBufferSubData(target, 0, entries.limit() * numberOfBytesPerEntry, entries);
       GLError.maybeThrowGLException("Failed to populate vertex buffer object", "glBufferSubData");
       size = entries.limit();
+
     } else {
-      GLES30.glBufferData(
-          target, entries.limit() * numberOfBytesPerEntry, entries, GLES30.GL_DYNAMIC_DRAW);
+      GLES30.glBufferData(target, entries.limit() * numberOfBytesPerEntry, entries, GLES30.GL_DYNAMIC_DRAW);
       GLError.maybeThrowGLException("Failed to populate vertex buffer object", "glBufferData");
       size = entries.limit();
       capacity = entries.limit();

@@ -8,9 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/** Module for handling OpenGL errors. */
 public class GLError {
-  /** Throws a {@link GLException} if a GL error occurred. */
   public static void maybeThrowGLException(String reason, String api) {
     List<Integer> errorCodes = getGlErrors();
     if (errorCodes != null) {
@@ -18,7 +16,6 @@ public class GLError {
     }
   }
 
-  /** Logs a message with the given logcat priority if a GL error occurred. */
   public static void maybeLogGLError(int priority, String tag, String reason, String api) {
     List<Integer> errorCodes = getGlErrors();
     if (errorCodes != null) {
@@ -41,12 +38,14 @@ public class GLError {
 
   private static List<Integer> getGlErrors() {
     int errorCode = GLES30.glGetError();
-    // Shortcut for no errors
+
     if (errorCode == GLES30.GL_NO_ERROR) {
       return null;
     }
+
     List<Integer> errorCodes = new ArrayList<>();
     errorCodes.add(errorCode);
+
     while (true) {
       errorCode = GLES30.glGetError();
       if (errorCode == GLES30.GL_NO_ERROR) {
@@ -54,6 +53,7 @@ public class GLError {
       }
       errorCodes.add(errorCode);
     }
+
     return errorCodes;
   }
 

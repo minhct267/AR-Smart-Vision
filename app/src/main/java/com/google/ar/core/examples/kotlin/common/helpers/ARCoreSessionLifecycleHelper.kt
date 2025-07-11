@@ -9,15 +9,10 @@ import com.google.ar.core.Session
 import com.google.ar.core.examples.java.common.helpers.CameraPermissionHelper
 import com.google.ar.core.exceptions.CameraNotAvailableException
 
-/** Manages an ARCore Session using the Android Lifecycle API. */
-class ARCoreSessionLifecycleHelper(
-  val activity: Activity,
-  val features: Set<Session.Feature> = setOf()
-) : DefaultLifecycleObserver {
+class ARCoreSessionLifecycleHelper(val activity: Activity, val features: Set<Session.Feature> = setOf()) : DefaultLifecycleObserver {
   var installRequested = false
   var session: Session? = null
     private set
-
   var exceptionCallback: ((Exception) -> Unit)? = null
   var beforeSessionResume: ((Session) -> Unit)? = null
 
@@ -44,7 +39,6 @@ class ARCoreSessionLifecycleHelper(
     }
   }
 
-  /** Called when the LifecycleOwner (Activity/Fragment) resumes. */
   override fun onResume(owner: LifecycleOwner) {
     val session = this.session ?: tryCreateSession() ?: return
     try {
@@ -56,30 +50,18 @@ class ARCoreSessionLifecycleHelper(
     }
   }
 
-  /** Called when the LifecycleOwner pauses. */
   override fun onPause(owner: LifecycleOwner) {
     session?.pause()
   }
 
-  /** Closes the session to release native resources. */
   override fun onDestroy(owner: LifecycleOwner) {
     session?.close()
     session = null
   }
 
-  /** Handles the result of the camera permission request. */
-  fun onRequestPermissionsResult(
-    requestCode: Int,
-    permissions: Array<out String>,
-    results: IntArray
-  ) {
+  fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, results: IntArray) {
     if (!CameraPermissionHelper.hasCameraPermission(activity)) {
-      Toast.makeText(
-          activity,
-          "Camera permission is needed to run this application",
-          Toast.LENGTH_LONG
-        )
-        .show()
+      Toast.makeText(activity, "Camera permission is needed to run this application", Toast.LENGTH_LONG).show()
 
       if (!CameraPermissionHelper.shouldShowRequestPermissionRationale(activity)) {
         CameraPermissionHelper.launchPermissionSettings(activity)

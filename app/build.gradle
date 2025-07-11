@@ -48,13 +48,13 @@ dependencies {
     implementation 'io.grpc:grpc-okhttp:1.73.0'
 
     // Google Cloud Vision APIs
-    implementation platform('com.google.cloud:libraries-bom:26.61.0')
-    implementation 'com.google.cloud:google-cloud-vision:3.61.0'
+    implementation platform('com.google.cloud:libraries-bom:26.63.0')
+    implementation 'com.google.cloud:google-cloud-vision:3.65.0'
 
     // Core libraries
-    implementation "androidx.appcompat:appcompat:1.7.0"
-    implementation "androidx.lifecycle:lifecycle-common-java8:2.9.0"
-    implementation "com.google.android.material:material:1.14.0-alpha01"
+    implementation "androidx.appcompat:appcompat:1.7.1"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.9.1"
+    implementation "com.google.android.material:material:1.14.0-alpha02"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2"

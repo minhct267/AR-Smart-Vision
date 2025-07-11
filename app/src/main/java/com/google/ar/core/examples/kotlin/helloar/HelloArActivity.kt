@@ -20,23 +20,20 @@ import com.google.ar.core.exceptions.UnavailableSdkTooOldException
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException
 
 class HelloArActivity : AppCompatActivity() {
-  companion object { private const val TAG = "HelloArActivity" }
+  companion object {
+    private const val TAG = "HelloArActivity"
+  }
 
-  // Core objects
   lateinit var arCoreSessionHelper: ARCoreSessionLifecycleHelper
   lateinit var view: HelloArView
   lateinit var renderer: HelloArRenderer
-
-  // Toggle-able feature settings (driven from the UI)
   val instantPlacementSettings = InstantPlacementSettings()
   val depthSettings = DepthSettings()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    // Setup ARCore session lifecycle helper and configuration
     arCoreSessionHelper = ARCoreSessionLifecycleHelper(this)
-
     arCoreSessionHelper.exceptionCallback =
       { exception ->
         val message =
@@ -53,35 +50,28 @@ class HelloArActivity : AppCompatActivity() {
         view.snackbarHelper.showError(this, message)
       }
 
-    // Configure session features, including: Lighting estimation, Depth mode, Instant placement
     arCoreSessionHelper.beforeSessionResume = ::configureSession
     lifecycle.addObserver(arCoreSessionHelper)
 
-    // Set up renderer
     renderer = HelloArRenderer(this)
     lifecycle.addObserver(renderer)
 
-    // Set up UI
     view = HelloArView(this)
     renderer.bindView(view)
     lifecycle.addObserver(view)
     setContentView(view.root)
 
-    // Kick off the render loop
     SampleRender(view.surfaceView, renderer, assets)
 
-    // Hook up on-screen toggles (Depth / Instant Placement)
     depthSettings.onCreate(this)
     instantPlacementSettings.onCreate(this)
   }
 
-  /** Configure the session, using Lighting Estimation, and Depth mode. */
   fun configureSession(session: Session) {
     session.configure(
       session.config.apply {
         lightEstimationMode = Config.LightEstimationMode.ENVIRONMENTAL_HDR
 
-        // Depth API is used if it is configured in Hello AR's settings
         depthMode =
           if (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC)) {
             Config.DepthMode.AUTOMATIC
@@ -89,7 +79,6 @@ class HelloArActivity : AppCompatActivity() {
             Config.DepthMode.DISABLED
           }
 
-        // Instant Placement is used if it is configured in Hello AR's settings
         instantPlacementMode =
           if (instantPlacementSettings.isInstantPlacementEnabled) {
             InstantPlacementMode.LOCAL_Y_UP
@@ -100,16 +89,10 @@ class HelloArActivity : AppCompatActivity() {
     )
   }
 
-  /** Permission callback */
-  override fun onRequestPermissionsResult(
-    requestCode: Int,
-    permissions: Array<String>,
-    results: IntArray
-  ) {
+  override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, results: IntArray) {
     super.onRequestPermissionsResult(requestCode, permissions, results)
     if (!CameraPermissionHelper.hasCameraPermission(this)) {
-      Toast.makeText(this, "Camera permission is needed to run this application", Toast.LENGTH_LONG)
-        .show()
+      Toast.makeText(this, "Camera permission is needed to run this application", Toast.LENGTH_LONG).show()
 
       if (!CameraPermissionHelper.shouldShowRequestPermissionRationale(this)) {
         CameraPermissionHelper.launchPermissionSettings(this)
@@ -119,7 +102,6 @@ class HelloArActivity : AppCompatActivity() {
     }
   }
 
-  /** Keep the sample immersive/full-screen when focus changes */
   override fun onWindowFocusChanged(hasFocus: Boolean) {
     super.onWindowFocusChanged(hasFocus)
     FullScreenHelper.setFullScreenOnWindowFocusChanged(this, hasFocus)

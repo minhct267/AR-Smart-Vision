@@ -1,7 +1,6 @@
 package com.google.ar.core.examples.java.common.samplerender.arcore;
 
 import android.opengl.Matrix;
-import com.google.ar.core.Camera;
 import com.google.ar.core.Plane;
 import com.google.ar.core.Pose;
 import com.google.ar.core.TrackingState;
@@ -25,36 +24,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Renders the detected AR planes. */
 public class PlaneRenderer {
   private static final String TAG = PlaneRenderer.class.getSimpleName();
-
   private static final String VERTEX_SHADER_NAME = "shaders/plane.vert";
   private static final String FRAGMENT_SHADER_NAME = "shaders/plane.frag";
   private static final String TEXTURE_NAME = "models/trigrid.png";
-
   private static final int BYTES_PER_FLOAT = Float.SIZE / 8;
   private static final int BYTES_PER_INT = Integer.SIZE / 8;
   private static final int COORDS_PER_VERTEX = 3;
-
   private static final int VERTS_PER_BOUNDARY_VERT = 2;
   private static final int INDICES_PER_BOUNDARY_VERT = 3;
   private static final int INITIAL_BUFFER_BOUNDARY_VERTS = 64;
-
-  private static final int INITIAL_VERTEX_BUFFER_SIZE_BYTES =
-      BYTES_PER_FLOAT * COORDS_PER_VERTEX * VERTS_PER_BOUNDARY_VERT * INITIAL_BUFFER_BOUNDARY_VERTS;
-
-  private static final int INITIAL_INDEX_BUFFER_SIZE_BYTES =
-      BYTES_PER_INT
-          * INDICES_PER_BOUNDARY_VERT
-          * INDICES_PER_BOUNDARY_VERT
-          * INITIAL_BUFFER_BOUNDARY_VERTS;
-
+  private static final int INITIAL_VERTEX_BUFFER_SIZE_BYTES = BYTES_PER_FLOAT * COORDS_PER_VERTEX * VERTS_PER_BOUNDARY_VERT * INITIAL_BUFFER_BOUNDARY_VERTS;
+  private static final int INITIAL_INDEX_BUFFER_SIZE_BYTES = BYTES_PER_INT * INDICES_PER_BOUNDARY_VERT * INDICES_PER_BOUNDARY_VERT * INITIAL_BUFFER_BOUNDARY_VERTS;
   private static final float FADE_RADIUS_M = 0.25f;
   private static final float DOTS_PER_METER = 10.0f;
   private static final float EQUILATERAL_TRIANGLE_SCALE = (float) (1 / Math.sqrt(3));
   private static final float[] GRID_CONTROL = {0.2f, 0.4f, 2.0f, 1.5f};
-
   private final Mesh mesh;
   private final IndexBuffer indexBufferObject;
   private final VertexBuffer vertexBufferObject;
@@ -64,6 +50,7 @@ public class PlaneRenderer {
       ByteBuffer.allocateDirect(INITIAL_VERTEX_BUFFER_SIZE_BYTES)
           .order(ByteOrder.nativeOrder())
           .asFloatBuffer();
+
   private IntBuffer indexBuffer =
       ByteBuffer.allocateDirect(INITIAL_INDEX_BUFFER_SIZE_BYTES)
           .order(ByteOrder.nativeOrder())
@@ -73,35 +60,25 @@ public class PlaneRenderer {
   private final float[] modelMatrix = new float[16];
   private final float[] modelViewMatrix = new float[16];
   private final float[] modelViewProjectionMatrix = new float[16];
-  private final float[] planeAngleUvMatrix =
-      new float[4];
+  private final float[] planeAngleUvMatrix = new float[4];
   private final float[] normalVector = new float[3];
-
   private final Map<Plane, Integer> planeIndexMap = new HashMap<>();
 
-  /** Allocates and initializes OpenGL resources needed by the plane renderer. */
   public PlaneRenderer(SampleRender render) throws IOException {
-    Texture texture =
-        Texture.createFromAsset(
-            render, TEXTURE_NAME, Texture.WrapMode.REPEAT, Texture.ColorFormat.LINEAR);
+    Texture texture = Texture.createFromAsset(render, TEXTURE_NAME, Texture.WrapMode.REPEAT, Texture.ColorFormat.LINEAR);
     shader =
-        Shader.createFromAssets(render, VERTEX_SHADER_NAME, FRAGMENT_SHADER_NAME, /*defines=*/ null)
+        Shader.createFromAssets(render, VERTEX_SHADER_NAME, FRAGMENT_SHADER_NAME, null)
             .setTexture("u_Texture", texture)
             .setVec4("u_GridControl", GRID_CONTROL)
-            .setBlend(
-                BlendFactor.DST_ALPHA, // RGB (src)
-                BlendFactor.ONE, // RGB (dest)
-                BlendFactor.ZERO, // ALPHA (src)
-                BlendFactor.ONE_MINUS_SRC_ALPHA) // ALPHA (dest)
+            .setBlend(BlendFactor.DST_ALPHA, BlendFactor.ONE, BlendFactor.ZERO, BlendFactor.ONE_MINUS_SRC_ALPHA)
             .setDepthWrite(false);
 
-    indexBufferObject = new IndexBuffer(render, /*entries=*/ null);
-    vertexBufferObject = new VertexBuffer(render, COORDS_PER_VERTEX, /*entries=*/ null);
+    indexBufferObject = new IndexBuffer(render, null);
+    vertexBufferObject = new VertexBuffer(render, COORDS_PER_VERTEX, null);
     VertexBuffer[] vertexBuffers = {vertexBufferObject};
     mesh = new Mesh(render, Mesh.PrimitiveMode.TRIANGLE_STRIP, indexBufferObject, vertexBuffers);
   }
 
-  /** Updates the plane model transform matrix and extents. */
   private void updatePlaneParameters(
       float[] planeMatrix, float extentX, float extentZ, FloatBuffer boundary) {
     System.arraycopy(planeMatrix, 0, modelMatrix, 0, 16);
@@ -175,10 +152,7 @@ public class PlaneRenderer {
     }
   }
 
-  /** Draws the collection of tracked planes, with closer planes hiding more distant ones. */
-  public void drawPlanes(
-      SampleRender render, Collection<Plane> allPlanes, Pose cameraPose, float[] cameraProjection) {
-
+  public void drawPlanes(SampleRender render, Collection<Plane> allPlanes, Pose cameraPose, float[] cameraProjection) {
     List<SortablePlane> sortedPlanes = new ArrayList<>();
 
     for (Plane plane : allPlanes) {
@@ -187,11 +161,13 @@ public class PlaneRenderer {
       }
 
       float distance = calculateDistanceToPlane(plane.getCenterPose(), cameraPose);
-      if (distance < 0) { // Plane is back-facing.
+      if (distance < 0) {
         continue;
       }
+
       sortedPlanes.add(new SortablePlane(distance, plane));
     }
+
     Collections.sort(
         sortedPlanes,
         new Comparator<SortablePlane>() {
@@ -206,41 +182,34 @@ public class PlaneRenderer {
     for (SortablePlane sortedPlane : sortedPlanes) {
       Plane plane = sortedPlane.plane;
       float[] planeMatrix = new float[16];
+
       plane.getCenterPose().toMatrix(planeMatrix, 0);
-
-      // Get transformed Y axis of plane's coordinate system.
       plane.getCenterPose().getTransformedAxis(1, 1.0f, normalVector, 0);
+      updatePlaneParameters(planeMatrix, plane.getExtentX(), plane.getExtentZ(), plane.getPolygon());
 
-      updatePlaneParameters(
-          planeMatrix, plane.getExtentX(), plane.getExtentZ(), plane.getPolygon());
-
-      // Get plane index. Keep a map to assign same indices to same planes.
       Integer planeIndex = planeIndexMap.get(plane);
       if (planeIndex == null) {
         planeIndex = planeIndexMap.size();
         planeIndexMap.put(plane, planeIndex);
       }
 
-      // Each plane will have its own angle offset from others, to make them easier to distinguish.
       float angleRadians = planeIndex * 0.144f;
       float uScale = DOTS_PER_METER;
       float vScale = DOTS_PER_METER * EQUILATERAL_TRIANGLE_SCALE;
+
       planeAngleUvMatrix[0] = +(float) Math.cos(angleRadians) * uScale;
       planeAngleUvMatrix[1] = -(float) Math.sin(angleRadians) * vScale;
       planeAngleUvMatrix[2] = +(float) Math.sin(angleRadians) * uScale;
       planeAngleUvMatrix[3] = +(float) Math.cos(angleRadians) * vScale;
 
-      // Build the ModelView and ModelViewProjection matrices for calculating cube position and light.
       Matrix.multiplyMM(modelViewMatrix, 0, viewMatrix, 0, modelMatrix, 0);
       Matrix.multiplyMM(modelViewProjectionMatrix, 0, cameraProjection, 0, modelViewMatrix, 0);
 
-      // Populate the shader uniforms for this frame.
       shader.setMat4("u_Model", modelMatrix);
       shader.setMat4("u_ModelViewProjection", modelViewProjectionMatrix);
       shader.setMat2("u_PlaneUvMatrix", planeAngleUvMatrix);
       shader.setVec3("u_Normal", normalVector);
 
-      // Set the position of the plane
       vertexBufferObject.set(vertexBuffer);
       indexBufferObject.set(indexBuffer);
 
@@ -258,15 +227,14 @@ public class PlaneRenderer {
     }
   }
 
-  /** Calculate the normal distance to plane from cameraPose. */
   public static float calculateDistanceToPlane(Pose planePose, Pose cameraPose) {
     float[] normal = new float[3];
     float cameraX = cameraPose.tx();
     float cameraY = cameraPose.ty();
     float cameraZ = cameraPose.tz();
-    // Get transformed Y axis of plane's coordinate system.
+
     planePose.getTransformedAxis(1, 1.0f, normal, 0);
-    // Compute dot product of plane's normal with vector from camera to plane center.
+
     return (cameraX - planePose.tx()) * normal[0]
         + (cameraY - planePose.ty()) * normal[1]
         + (cameraZ - planePose.tz()) * normal[2];
