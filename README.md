@@ -2,13 +2,13 @@
 
 ## 🌟 Overview
 
-AR Vision Scanner is an advanced Android application that combines the power of Google's ARCore with computer vision capabilities. It allows users to interact with augmented reality objects, detect real-world surfaces, and identify objects in their environment through their device's camera.
+AR Smart Vision is an advanced Android application that combines the power of Google's ARCore with computer vision capabilities. It allows users to interact with augmented reality objects, detect real-world surfaces, and identify objects in their environment through their device's camera.
 
 ## ✨ Features
 
 - **Real-time AR Object Placement**: Place and interact with virtual objects in your real environment
 - **Surface Detection**: Automatically detect and track real-world surfaces
-- **Object Recognition**: Identify objects in your environment using Cloud Vision integration
+- **Object Recognition**: Identify objects in your environment
 - **Environmental Understanding**: Advanced lighting and environmental mapping
 - **Interactive Anchors**: Place and manage multiple AR anchors in your space
 - **Smooth Performance**: Optimized rendering and tracking for smooth AR experience

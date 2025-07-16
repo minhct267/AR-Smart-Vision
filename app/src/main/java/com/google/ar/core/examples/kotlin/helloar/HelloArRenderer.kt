@@ -346,19 +346,13 @@ class HelloArRenderer(val activity: HelloArActivity) : SampleRender.Renderer, De
       scanButtonWasPressed = false
       val cameraImage = frame.tryAcquireCameraImage()
       if (cameraImage != null) {
-        Log.e("Mimo", "Lấy được ảnh!")
         launch(Dispatchers.IO) {
           try {
               val cameraId = session.cameraConfig.cameraId
               val imageRotation = displayRotationHelper.getCameraSensorToDisplayRotation(cameraId)
-              Log.e("Mimo", "Bắt đầu analyze object detection")
-
               objectResults = objectDetector.analyze(cameraImage, imageRotation)
-              Log.e("Mimo", "Kết quả objectResults: $objectResults")
-
               cameraImage.close()
           } catch (e: Exception) {
-              Log.e("Mimo", "Lỗi khi detect object: ${e.message}", e)
               view.post {
                 view.setScanningActive(false)
                 showSnackbar("Object detection failed: ${e.message}")
@@ -366,7 +360,6 @@ class HelloArRenderer(val activity: HelloArActivity) : SampleRender.Renderer, De
           }
         }
       } else {
-        Log.e("Mimo", "Could not acquire camera image for object detection!")
         view.post { view.setScanningActive(false) }
         showSnackbar("Fail to receive camera image for object detection!")
       }
@@ -376,12 +369,9 @@ class HelloArRenderer(val activity: HelloArActivity) : SampleRender.Renderer, De
     val objects = objectResults
     if (objects != null) {
       objectResults = null
-      Log.i("Mimi", "$objectDetector got objects: $objects")
 
       val anchors = objects.mapNotNull { obj ->
         val (atX, atY) = obj.centerCoordinate
-        Log.e("Mimi", "Trying to create anchor at ($atX, $atY)")
-
         val anchor = createAnchor(atX.toFloat(), atY.toFloat(), frame) ?: return@mapNotNull null
         DetectedAnchor(anchor, obj.label, System.nanoTime())
       }
@@ -398,7 +388,7 @@ class HelloArRenderer(val activity: HelloArActivity) : SampleRender.Renderer, De
                 showSnackbar("Try moving your device around to obtain a better understanding of the environment!")
             }
         } catch (e: Exception) {
-            Log.e("Mimi", "Exception when updating UI: ${e.message}", e)
+            Log.e(TAG, "Exception when updating UI: ${e.message}", e)
         }
       }
     }
