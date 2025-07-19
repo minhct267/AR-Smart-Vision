@@ -54,7 +54,11 @@ AR Smart Vision is an advanced Android application that combines the power of Go
 
 ## 📱 Demo
 
+### Gif
 ![▶️ Watch demo video](demo.gif)
+
+### Full video
+[▶️ Watch demo video](demo.mp4)
 
 ---
 
