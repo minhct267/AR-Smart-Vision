@@ -44,7 +44,7 @@ AR Smart Vision is an advanced Android application that combines the power of Go
 5. Use the scan button to identify objects in view
 6. Interact with placed objects using touch gestures
 
-## ��️ Technical Details
+## � Technical Details
 
 - Built with Kotlin for modern Android development
 - Utilizes ARCore for AR capabilities
@@ -52,9 +52,9 @@ AR Smart Vision is an advanced Android application that combines the power of Go
 - Uses OpenGL ES for rendering
 - Implements environmental lighting for realistic AR objects
 
-## 📱 Screenshots
+## 📱 Demo
 
-_[TODO]_
+[▶️ Watch demo video](demo.mp4)
 
 ---
 
