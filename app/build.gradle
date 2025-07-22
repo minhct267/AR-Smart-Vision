@@ -39,22 +39,22 @@ android {
 
 dependencies {
     // ARCore library
-    implementation 'com.google.ar:core:1.49.0'
+    implementation "com.google.ar:core:1.50.0"
 
     // Simple Wavefront OBJ file loader
-    implementation 'de.javagl:obj:0.4.0'
+    implementation "de.javagl:obj:0.4.0"
 
     // HTTP Client
-    implementation 'io.grpc:grpc-okhttp:1.73.0'
+    implementation "io.grpc:grpc-okhttp:1.73.0"
 
     // Google Cloud Vision APIs
-    implementation platform('com.google.cloud:libraries-bom:26.63.0')
-    implementation 'com.google.cloud:google-cloud-vision:3.65.0'
+    implementation platform('com.google.cloud:libraries-bom:26.64.0')
+    implementation "com.google.cloud:google-cloud-vision:3.66.0"
 
     // Core libraries
     implementation "androidx.appcompat:appcompat:1.7.1"
-    implementation "androidx.lifecycle:lifecycle-common-java8:2.9.1"
-    implementation "com.google.android.material:material:1.14.0-alpha02"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.9.2"
+    implementation "com.google.android.material:material:1.14.0-alpha03"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2"
