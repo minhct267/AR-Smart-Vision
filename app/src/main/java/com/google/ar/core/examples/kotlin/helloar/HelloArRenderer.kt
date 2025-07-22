@@ -104,10 +104,10 @@ class HelloArRenderer(val activity: HelloArActivity) : SampleRender.Renderer, De
   val viewLightDirection = FloatArray(4)
 
   lateinit var view: HelloArView
-  val session
-    get() = activity.arCoreSessionHelper.session
   val displayRotationHelper = DisplayRotationHelper(activity)
   val trackingStateHelper = TrackingStateHelper(activity)
+  val session
+    get() = activity.arCoreSessionHelper.session
 
   private fun hideSnackbar() = activity.view.snackbarHelper.hide(activity)
   private fun showSnackbar(message: String): Unit = activity.view.snackbarHelper.showError(activity, message)
@@ -205,7 +205,6 @@ class HelloArRenderer(val activity: HelloArActivity) : SampleRender.Renderer, De
           .setTexture("u_Cubemap", cubemapFilter.filteredCubemapTexture)
           .setTexture("u_DfgTexture", dfgTexture)
 
-
       // Flicker effect mesh and shader
       flickerMesh = Mesh.createFromAsset(render, "models/flicker.obj")
       flickerShader = Shader.createFromAssets(
@@ -217,7 +216,6 @@ class HelloArRenderer(val activity: HelloArActivity) : SampleRender.Renderer, De
 
       // Initialize label renderer
       labelRenderer.onSurfaceCreated(render)
-
     } catch (e: IOException) {
       Log.e(TAG, "Failed to read a required asset file", e)
       showError("Failed to read a required asset file: $e")
@@ -230,10 +228,8 @@ class HelloArRenderer(val activity: HelloArActivity) : SampleRender.Renderer, De
   }
 
   override fun onDrawFrame(render: SampleRender) {
-    Log.e("Mimo", "onDrawFrame called")
-
+    Log.e(TAG, "onDrawFrame called")
     val session = session ?: return
-
     if (!hasSetTextureNames) {
       session.setCameraTextureNames(intArrayOf(backgroundRenderer.cameraColorTexture.textureId))
       hasSetTextureNames = true
@@ -281,7 +277,6 @@ class HelloArRenderer(val activity: HelloArActivity) : SampleRender.Renderer, De
         // Depth data not available yet, ignore
       }
     }
-
 
     // Handle user tap (placing anchors)
     handleTap(frame, camera)
@@ -538,7 +533,6 @@ class HelloArRenderer(val activity: HelloArActivity) : SampleRender.Renderer, De
 
       render.draw(flickerMesh, flickerShader, virtualSceneFramebuffer)
     }
-
     // Compose the virtual scene with the background
     backgroundRenderer.drawVirtualScene(render, virtualSceneFramebuffer, Z_NEAR, Z_FAR)
   }
@@ -711,7 +705,7 @@ private data class WrappedAnchor(
   val flickerFrequencyHz: Double
 )
 
-/* Stores an anchor and its associated label (for object detection) */
+/* Stores an anchor and its associated label */
 data class DetectedAnchor(
   val anchor: Anchor,
   val label: String,

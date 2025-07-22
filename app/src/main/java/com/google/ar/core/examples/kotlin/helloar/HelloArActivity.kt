@@ -59,8 +59,8 @@ class HelloArActivity : AppCompatActivity() {
     view = HelloArView(this)
     renderer.bindView(view)
     lifecycle.addObserver(view)
-    setContentView(view.root)
 
+    setContentView(view.root)
     SampleRender(view.surfaceView, renderer, assets)
 
     depthSettings.onCreate(this)
@@ -93,11 +93,9 @@ class HelloArActivity : AppCompatActivity() {
     super.onRequestPermissionsResult(requestCode, permissions, results)
     if (!CameraPermissionHelper.hasCameraPermission(this)) {
       Toast.makeText(this, "Camera permission is needed to run this application", Toast.LENGTH_LONG).show()
-
       if (!CameraPermissionHelper.shouldShowRequestPermissionRationale(this)) {
         CameraPermissionHelper.launchPermissionSettings(this)
       }
-
       finish()
     }
   }

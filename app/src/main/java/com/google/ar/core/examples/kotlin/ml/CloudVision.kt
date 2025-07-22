@@ -18,7 +18,7 @@ import com.google.cloud.vision.v1.Image as GCVImage
 
 class CloudVision(val activity: HelloArActivity) : ObjectDetector(activity) {
   companion object {
-    const val TAG = "GoogleCloudVisionDetector"
+    const val TAG = "CloudVision"
   }
 
   init {
